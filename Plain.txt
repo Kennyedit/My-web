@@ -1,0 +1,22 @@
+import bpy
+# Set up scenebpy.ops.object.select_all(action='DESELECT')
+bpy.ops.object.select_by_type(type='MESH')bpy.ops.object.delete()
+# Add emitter objectbpy.ops.mesh.primitive_plane_add(size=2)plane = 
+bpy.context.object
+# Add particle system to the emitter objectbpy.ops.object.particle_system_add()
+ps = plane.particle_systems[-1].settingsps.frame_start = 1ps.frame_end = 100
+ps.type = 'FLAME'ps.flame_smoke = Trueps.flame_rate = 10ps.flame_smoke_color = 
+(0, 0, 0)ps.flame_flame_factor = 5
+# Add light sourcebpy.ops.object.light_add(type='POINT', radius=1, 
+align='WORLD', location=(0, 0, 5))light = bpy.context.objectlight.data.energy = 
+1000light.data.shadow_soft_size = 0.1
+# Set up material for emitter objectmat = 
+bpy.data.materials.new(name="Flame_Material")mat.use_nodes = Truenodes = 
+mat.node_tree.nodesfor node in nodes: nodes.remove(node)output_node = 
+nodes.new(type='ShaderNodeOutputMaterial')output_node.location = 400, 0
+emission_node = nodes.new(type='ShaderNodeEmission')
+emission_node.inputs[0].default_value = (1, 0.3, 0) # Flame color (orange)
+emission_node.location = 0, 0links = mat.node_tree.linkslink = 
+links.new(emission_node.outputs[0], output_node.inputs[0])
+# Assign material to emitter objectif plane.data.materials: 
+plane.data.materials[0] = matelse: plane.data.materials.append(mat)
